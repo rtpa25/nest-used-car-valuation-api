@@ -15,7 +15,7 @@ import { Report } from './reports/report.entity';
       type: 'sqlite',
       database: 'db.sqlite',
       entities: [User, Report],
-      synchronize: true,
+      synchronize: true, //*only true in dev, via this setting the ORM and nest syncs the DB with changes in the entity file, same thing is achived via migrations with real prod DB's
     }), //this connection is going to be shared bettwen all the modules
   ],
   controllers: [AppController],
