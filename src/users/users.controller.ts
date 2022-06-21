@@ -8,21 +8,57 @@ import {
   Patch,
   Post,
   Query,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/guards/auth.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserDto } from './dtos/user.dto';
+import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('auth')
-@Serialize(UserDto) //*custom decorator
+@Serialize(UserDto) //*custom decorator that implements a custom interceptor to exclude the password value out of the user object
+// @UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private authService: AuthService,
+  ) {}
+
+  @Get('/whoami')
+  @UseGuards(AuthGuard)
+  whoAmI(@CurrentUser() user: User) {
+    return user;
+  }
+
+  @Post('/signout')
+  signOut(@Session() session: any) {
+    session.userId = null;
+  }
 
   @Post('/signup')
-  createUser(@Body() { email, password }: CreateUserDto) {
-    this.usersService.create(email, password);
+  async createUser(
+    @Body() { email, password }: CreateUserDto,
+    @Session() session: any,
+  ) {
+    const user = await this.authService.signup(email, password);
+    session.userId = user.id;
+    return user;
+  }
+
+  @Post('/signin')
+  async signin(
+    @Body() { email, password }: CreateUserDto,
+    @Session() session: any,
+  ) {
+    const user = await this.authService.signin(email, password);
+    session.userId = user.id; //if no actuall change then Set-Cookie header is absent in the response
+    return user;
   }
 
   @Get('/:id')
