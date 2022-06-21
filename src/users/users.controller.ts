@@ -31,7 +31,6 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    55;
     return user;
   }
 
