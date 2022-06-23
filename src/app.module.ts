@@ -3,12 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getConnectionOptions } from 'typeorm';
+import { DBOptions } from 'db.datasourceoptions';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -20,10 +18,10 @@ const cookieSession = require('cookie-session');
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: async () => {
-        return Object.assign(await getConnectionOptions(), {
-          keepConnectionAlive: true,
-        });
+      useFactory: (config: ConfigService) => {
+        const dbOptions: TypeOrmModuleOptions = {};
+        Object.assign(dbOptions, DBOptions);
+        return dbOptions;
       },
     }),
   ],

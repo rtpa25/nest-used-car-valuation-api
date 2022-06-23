@@ -1,20 +1,22 @@
-var dbConfig = {
+const _DBOptions = {
+  type: 'sqlite',
+  entities: [__dirname + '/**/*.entity{.js,.ts}'],
   synchronize: false,
+  migrations: [__dirname + '/migrations/*.js'],
 };
 
 switch (process.env.NODE_ENV) {
   case 'development':
-    Object.assign(dbConfig, {
+    Object.assign(_DBOptions, {
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: ['**/*.entity.js'],
     });
     break;
   case 'test':
-    Object.assign(dbConfig, {
+    Object.assign(_DBOptions, {
       type: 'sqlite',
       database: 'test.sqlite',
-      entities: ['**/*.entity.ts'],
+      migrationsRun: true,
     });
     break;
   case 'production':
@@ -23,4 +25,4 @@ switch (process.env.NODE_ENV) {
     throw new Error('unknown environment');
 }
 
-module.exports = dbConfig;
+export const DBOptions = _DBOptions;
