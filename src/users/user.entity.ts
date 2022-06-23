@@ -1,3 +1,4 @@
+import { Report } from 'src/reports/report.entity';
 import {
   Entity,
   Column,
@@ -5,6 +6,7 @@ import {
   AfterInsert,
   AfterRemove,
   AfterUpdate,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -17,6 +19,12 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({ default: true })
+  admin: boolean;
+
+  @OneToMany(() => Report, (report) => report.user) //the function declaration 1st arg is basically dealing with the cicrular dependency between User and Rerport
+  reports: Report[];
 
   //-----THESE HOOKS ARE ONLY EXECUTED WHEN AN ENTITY IS CREATED AND THEN SAVED-----------//
   @AfterInsert()
