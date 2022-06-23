@@ -8,6 +8,7 @@ import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getConnectionOptions } from 'typeorm';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -18,7 +19,13 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => {
+        return Object.assign(await getConnectionOptions(), {
+          keepConnectionAlive: true,
+        });
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [

@@ -4,7 +4,6 @@ var dbConfig = {
 
 switch (process.env.NODE_ENV) {
   case 'development':
-    console.log('0000');
     Object.assign(dbConfig, {
       type: 'sqlite',
       database: 'db.sqlite',
